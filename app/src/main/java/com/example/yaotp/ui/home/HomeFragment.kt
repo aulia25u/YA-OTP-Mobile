@@ -28,11 +28,13 @@ class HomeFragment : Fragment() {
         if (isGranted) {
             getDeviceIMEI()
         } else {
-            Snackbar.make(
-                binding.root,
-                "Phone state permission is required for IMEI",
-                Snackbar.LENGTH_LONG
-            ).show()
+            _binding?.let { binding ->
+                Snackbar.make(
+                    binding.root,
+                    "Phone state permission is required for IMEI",
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
         }
     }
 
@@ -41,34 +43,53 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        // Initialize ViewModel after view creation
+        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+        
+        // Setup UI after view creation
+        setupUI()
+        
+        // Request permissions after a delay to ensure UI is ready
+        view.post {
+            checkPermissions()
+        }
+    }
+
+    private fun setupUI() {
         setupBiometric()
         setupClickListeners()
         observeViewModel()
-        checkPermissions()
     }
 
     private fun setupBiometric() {
-        biometricHelper = BiometricHelper(this)
-        if (!biometricHelper.isBiometricAvailable(requireContext())) {
+        try {
+            biometricHelper = BiometricHelper(this)
+            if (!biometricHelper.isBiometricAvailable(requireContext())) {
+                binding.fingerprintButton.visibility = View.GONE
+            }
+            
+            biometricHelper.setupBiometric(
+                onSuccess = {
+                    // On successful fingerprint auth, navigate to upload screen
+                    navigateToUpload()
+                },
+                onError = { error ->
+                    _binding?.let { binding ->
+                        Snackbar.make(binding.root, error, Snackbar.LENGTH_SHORT).show()
+                    }
+                }
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
             binding.fingerprintButton.visibility = View.GONE
         }
-        
-        biometricHelper.setupBiometric(
-            onSuccess = {
-                // On successful fingerprint auth, navigate to upload screen
-                navigateToUpload()
-            },
-            onError = { error ->
-                Snackbar.make(binding.root, error, Snackbar.LENGTH_SHORT).show()
-            }
-        )
     }
 
     private fun setupClickListeners() {
@@ -89,7 +110,16 @@ class HomeFragment : Fragment() {
         }
 
         binding.fingerprintButton.setOnClickListener {
-            biometricHelper.authenticate()
+            try {
+                biometricHelper.authenticate()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Snackbar.make(
+                    binding.root,
+                    "Biometric authentication not available",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
@@ -97,24 +127,30 @@ class HomeFragment : Fragment() {
         viewModel.loginResult.observe(viewLifecycleOwner) { result ->
             result.fold(
                 onSuccess = { message ->
-                    Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
-                    // On successful login, navigate to upload screen
-                    navigateToUpload()
+                    _binding?.let { binding ->
+                        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+                        // On successful login, navigate to upload screen
+                        navigateToUpload()
+                    }
                 },
                 onFailure = { exception ->
-                    Snackbar.make(
-                        binding.root,
-                        exception.message ?: "Login failed",
-                        Snackbar.LENGTH_LONG
-                    ).show()
+                    _binding?.let { binding ->
+                        Snackbar.make(
+                            binding.root,
+                            exception.message ?: "Login failed",
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                    }
                 }
             )
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.loadingProgress.visibility = if (isLoading) View.VISIBLE else View.GONE
-            binding.loginButton.isEnabled = !isLoading
-            binding.fingerprintButton.isEnabled = !isLoading
+            _binding?.let { binding ->
+                binding.loadingProgress.visibility = if (isLoading) View.VISIBLE else View.GONE
+                binding.loginButton.isEnabled = !isLoading
+                binding.fingerprintButton.isEnabled = !isLoading
+            }
         }
     }
 
@@ -127,14 +163,22 @@ class HomeFragment : Fragment() {
     }
 
     private fun getDeviceIMEI() {
-        val imei = DeviceUtils.getDeviceIMEI(requireContext())
-        if (imei != null) {
-            println("Device IMEI: $imei")
+        try {
+            val imei = DeviceUtils.getDeviceIMEI(requireContext())
+            if (imei != null) {
+                println("Device IMEI: $imei")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     private fun navigateToUpload() {
-        findNavController().navigate(R.id.navigation_upload)
+        try {
+            findNavController().navigate(R.id.navigation_upload)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onDestroyView() {
