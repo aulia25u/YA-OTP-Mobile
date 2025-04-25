@@ -7,7 +7,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object ApiClient {
-    private const val BASE_URL = "http://127.0.0.1/Entrust-Dashboard/v2/src/html/"
+    // Changed BASE_URL to Android emulator localhost alias for network access
+    private const val BASE_URL = "http://10.0.2.2/Entrust-Dashboard/v2/src/html/"
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(HttpLoggingInterceptor().apply {
