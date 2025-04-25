@@ -30,7 +30,8 @@
         <activity
             android:name=".SplashActivity"
             android:exported="true"
-            android:theme="@style/Theme.YAOTP.NoActionBar">
+            android:theme="@style/Theme.YAOTP.Splash"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -40,7 +41,9 @@
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
 
     </application>
 </manifest>

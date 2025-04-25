@@ -13,7 +13,15 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
     </style>
 
-    <!-- Splash screen theme without action bar -->
+    <!-- Splash screen theme -->
+    <style name="Theme.YAOTP.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/purple_500</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.YAOTP</item>
+    </style>
+
+    <!-- No Action Bar theme -->
     <style name="Theme.YAOTP.NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
