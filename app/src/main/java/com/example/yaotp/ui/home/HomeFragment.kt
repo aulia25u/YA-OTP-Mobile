@@ -1,41 +1,28 @@
 package com.example.yaotp.ui.home
 
-import android.Manifest
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.yaotp.R
-import com.example.yaotp.databinding.FragmentHomeNewBinding
-import com.example.yaotp.utils.BiometricHelper
-import com.example.yaotp.utils.DeviceUtils
+import com.example.yaotp.databinding.FragmentHomeBinding
 import com.google.android.material.snackbar.Snackbar
 
 class HomeFragment : Fragment() {
 
-    private var _binding: FragmentHomeNewBinding? = null
+    private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: HomeViewModel
-    private var biometricHelper: BiometricHelper? = null
-
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            getDeviceIMEI()
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentHomeNewBinding.inflate(inflater, container, false)
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -48,11 +35,6 @@ class HomeFragment : Fragment() {
             
             // Setup UI
             setupUI()
-            
-            // Request permissions after a delay to ensure UI is ready
-            view.post {
-                checkPermissions()
-            }
         } catch (e: Exception) {
             e.printStackTrace()
             showError("Failed to initialize: ${e.message}")
@@ -60,38 +42,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupUI() {
-        setupBiometric()
         setupClickListeners()
         observeViewModel()
-    }
-
-    private fun setupBiometric() {
-        try {
-            context?.let { ctx ->
-                // Initialize biometric helper
-                biometricHelper = BiometricHelper(this)
-                
-                // Check if biometric is available
-                if (biometricHelper?.isBiometricAvailable(ctx) == true) {
-                    binding.fingerprintButton.visibility = View.VISIBLE
-                    
-                    biometricHelper?.setupBiometric(
-                        onSuccess = {
-                            navigateToUpload()
-                        },
-                        onError = { error ->
-                            showError(error)
-                        }
-                    )
-                } else {
-                    binding.fingerprintButton.visibility = View.GONE
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            binding.fingerprintButton.visibility = View.GONE
-            showError("Biometric not available: ${e.message}")
-        }
     }
 
     private fun setupClickListeners() {
@@ -105,15 +57,6 @@ class HomeFragment : Fragment() {
             }
 
             viewModel.login(username, password)
-        }
-
-        binding.fingerprintButton.setOnClickListener {
-            try {
-                biometricHelper?.authenticate()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                showError("Biometric authentication failed: ${e.message}")
-            }
         }
     }
 
@@ -133,26 +76,6 @@ class HomeFragment : Fragment() {
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.loadingProgress.visibility = if (isLoading) View.VISIBLE else View.GONE
             binding.loginButton.isEnabled = !isLoading
-            binding.fingerprintButton.isEnabled = !isLoading
-        }
-    }
-
-    private fun checkPermissions() {
-        if (!DeviceUtils.hasReadPhoneStatePermission(requireContext())) {
-            requestPermissionLauncher.launch(Manifest.permission.READ_PHONE_STATE)
-        } else {
-            getDeviceIMEI()
-        }
-    }
-
-    private fun getDeviceIMEI() {
-        try {
-            val deviceId = DeviceUtils.getDeviceIMEI(requireContext())
-            if (deviceId != null) {
-                println("Device ID: $deviceId")
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 
@@ -180,6 +103,5 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        biometricHelper = null
     }
 }
