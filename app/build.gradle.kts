@@ -3,10 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
-repositories {
-    maven { url = uri("https://jitpack.io") }
-}
-
 android {
     namespace = "com.example.yaotp"
     compileSdk = 34
