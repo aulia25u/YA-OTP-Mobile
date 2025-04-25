@@ -1,6 +1,19 @@
 <resources>
     <string name="app_name">YA OTP</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_home">Login</string>
+    <string name="title_upload">Upload</string>
+    <string name="title_profile">Profile</string>
+    
+    <!-- Login Screen -->
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="btn_login">Login</string>
+    <string name="btn_fingerprint">Use Fingerprint</string>
+    
+    <!-- Upload Screen -->
+    <string name="btn_pick_image">Pick Image</string>
+    <string name="btn_upload">Upload</string>
+    
+    <!-- Profile Screen -->
+    <string name="btn_logout">Logout</string>
 </resources>
