@@ -2,20 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Internet Permission -->
     <uses-permission android:name="android.permission.INTERNET" />
-    
-    <!-- IMEI Access -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    
-    <!-- Storage Permissions -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    
-    <!-- Biometric -->
-    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
     <application
+        android:name=".MyApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -23,21 +13,36 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.YAOTP"
-        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.MSFAuthentication"
         tools:targetApi="31">
-
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize">
+            android:name=".presentation.uploadimageresult.UploadImageResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.settings.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.uploadimage.UploadImageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.splash.RoutingActivity"
+            android:exported="false"></activity>
+        <activity
+            android:name=".presentation.otp.OTPActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.login.LoginActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".presentation.dashboard.DashboardActivity"
+            android:exported="false" />
     </application>
+
 </manifest>
